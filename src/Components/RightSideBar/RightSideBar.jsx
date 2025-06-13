@@ -106,7 +106,9 @@ const RightSideBar = ({ setTasks, numberOfCompletedTasks, allTasksLength }) => {
                 onHide={closeMob}
                 scroll
                 backdrop={isMobile}
-                unmountOnExit={false}
+                /*  ⬇️ УБИРАЕМ фиксированное false — панель размонтируется,
+                    когда show === false, и не занимает место на странице  */
+                /* unmountOnExit={false} */
             >
                 {PanelContent}
             </OffcanvasMobile>

@@ -1,92 +1,90 @@
+// src/Layouts/Header/Header.styled.js
 import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 
+/* ───────── обёртка шапки ───────── */
 export const Container = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  @media (min-width: 768px) {
-    flex-direction: row;
-  }
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;          /* элементы могут переноситься */
+    column-gap: 12px;
+    row-gap: 8px;
+    position: relative;
 `;
 
-// styles of add new tasks button
+/* ───────── кнопка «Добавить задачу» ───────── */
 export const TaskBtn = styled(Button)`
-  margin: 20px;
-  background-color: ${({ theme }) => theme.canvas} !important;
-  width: 80%;
-  right: 0;
-  justify-content: flex-end;
-  border: none;
-  :hover {
-    background-color: ${({ theme }) => theme.background.hover} !important;
-  }
+    background: ${({ theme }) => theme.canvas}!important;
+    border: none;
+    padding: 0.45rem 1.1rem;
 
-  @media (min-width: 768px) {
-    width: auto;
-    margin-right: 20px;
-  }
+    :hover {
+        background: ${({ theme }) => theme.background.hover}!important;
+    }
 `;
+
+/* ───────── текущая дата (видна ≥768 px) ───────── */
 export const DateContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  color: ${({ theme }) => theme.color.primary};
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: ${({ theme }) => theme.color.primary};
 
-  @media (min-width: 768px) {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  @media (max-width: 768px) {
-    display: none;
-  }
+    @media (min-width: 768px) {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    @media (max-width: 767.98px) {
+        display: none;
+    }
 `;
+
+/* ───────── блок уведомлений + кнопка ───────── */
 export const NotificationContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  svg {
-    color: ${({ theme }) => theme.canvas} !important;
-    margin-left: 10px;
-    cursor: pointer;
-  }
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-  @media (min-width: 768px) {
-    position: absolute;
-    top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
-  }
+    /* на десктопе — прижимаем вправо */
+    @media (min-width: 768px) {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+    }
 `;
+
+/* ───────── иконка колокольчика ───────── */
 export const NotificationIcon = styled.span`
-  position: relative;
-  @media (max-width: 768px) {
-    display: none;
-  }
+    position: relative;
+    display: flex;
+    cursor: pointer;
+
+    svg {
+        width: 32px;
+        height: 32px;
+        color: ${({ theme }) => theme.canvas};
+    }
 `;
 
-export const ButtonContainer = styled.div`
-  display: flex;
-  //gap: 10px; /* ✅ Уменьшили расстояние между кнопками */
-  align-items: center;
-  //margin-left: auto; /* ✅ Двигаем вправо */
-`;
-
-
+/* ───────── счётчик над колокольчиком ───────── */
 export const NotificationBadge = styled.div`
-  background-color: red;
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  right: 2px;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: red;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px;
+    border-radius: 50%;
 `;
 
+/* ───────── резерв (если понадобится обёртка для кнопок) ───────── */
+export const ButtonContainer = styled.div`
+    display: flex;
+    align-items: center;
+`;
