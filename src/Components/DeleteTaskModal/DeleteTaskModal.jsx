@@ -1,72 +1,61 @@
-// Imports
-import React from "react";
-import Modal   from "react-bootstrap/Modal";
-import Button  from "react-bootstrap/Button";
-
-import { ConfirmBtn }   from "./DeleteTaskModal.styled";
-import { useContext }   from "react";
+// DeleteTaskModal.jsx
+import React, { useContext } from "react";
+import Modal         from "react-bootstrap/Modal";
+import Button        from "react-bootstrap/Button";
+import { ConfirmBtn, DialogLower } from "./DeleteTaskModal.styled";
 import { AuthContext }  from "Contexts/AuthContext";
 import { loadTasks, saveTasks } from "Utils/tasksStorage";
 
-/**
- * Модалка-подтверждение удаления задачи / всех задач
- */
 const DeleteTaskModal = ({
-                           deleteTask,
-                           setDeleteTask,
-                           singleTask,
-                           titleTask,
-                           setTasks,
+                             deleteTask,
+                             setDeleteTask,
+                             singleTask,
+                             titleTask,
+                             setTasks,
                          }) => {
-  const { user } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
 
-  /** закрыть окно */
-  const closeDeleteTaskModal = () => setDeleteTask(false);
+    const close = () => setDeleteTask(false);
 
-  /** удалить */
-  const handleTaskDelete = () => {
-    let storedTasks = loadTasks(user);
+    const remove = () => {
+        const filtered = singleTask
+            ? loadTasks(user).filter(t => t.title !== titleTask)
+            : [];
+        saveTasks(user, filtered);
+        setTasks(filtered);
+        close();
+    };
 
-    if (singleTask) {
-      storedTasks = storedTasks.filter((t) => t.title !== titleTask);
-    } else {
-      storedTasks = [];
-    }
+    return (
+        <Modal
+            show={deleteTask}
+            onHide={close}
+            backdrop="static"
+            keyboard
+            /* <<< привяжем наш класс для .modal-dialog */
+            dialogClassName="dialog-lower"
+            centered={false}   /* важно: иначе bootstrap центрирует по-умолчанию */
+        >
+            <Modal.Header closeButton>
+                <Modal.Title>
+                    {singleTask
+                        ? `Удалить «${titleTask}»?`
+                        : "Удалить все задачи?"}
+                </Modal.Title>
+            </Modal.Header>
 
-    saveTasks(user, storedTasks);
-    setTasks(storedTasks);
-    closeDeleteTaskModal();
-  };
+            <Modal.Body>
+                {singleTask
+                    ? "Эта задача будет удалена без возможности восстановления."
+                    : "Все данные будут удалены без возможности восстановления."}
+            </Modal.Body>
 
-  return (
-      <Modal
-          show={deleteTask}
-          onHide={closeDeleteTaskModal}
-          backdrop="static"
-          keyboard
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {singleTask
-                ? `Вы уверены, что хотите удалить ${titleTask}?`
-                : "Вы уверены, что хотите удалить все задачи?"}
-          </Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          {singleTask
-              ? "Эта задача будет удалена без возможности восстановления."
-              : "Все данные будут удалены без возможности восстановления."}
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant="transparent" onClick={closeDeleteTaskModal}>
-            Отмена
-          </Button>
-          <ConfirmBtn onClick={handleTaskDelete}>Подтвердить</ConfirmBtn>
-        </Modal.Footer>
-      </Modal>
-  );
+            <Modal.Footer>
+                <Button variant="transparent" onClick={close}>Отмена</Button>
+                <ConfirmBtn onClick={remove}>Подтвердить</ConfirmBtn>
+            </Modal.Footer>
+        </Modal>
+    );
 };
 
 export default DeleteTaskModal;

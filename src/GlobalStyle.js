@@ -29,4 +29,11 @@ export const GlobalStyle = createGlobalStyle`
       overflow-x: hidden;
       box-sizing: border-box;   /* чтобы padding не расширял 100 %-ширину */
   }
+
+  /* index.css  или  styled-components GlobalStyle */
+  .dialog-lower.modal-dialog {
+      margin-top: 120px;
+      min-width: 300px;        /* тот же fallback, что и в DialogLower */
+  }
+
 `;
