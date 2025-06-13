@@ -1,0 +1,14 @@
+.auth-toggle {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.auth-toggle button {
+    background: none;
+    border: none;
+    color: var(--bs-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+}
