@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 const SIDEBAR_WIDTH = "270px";
 
 /* ─── десктоп-сайдбар ─── */
-export const AsideSidebar = styled.aside`
+export const AsideSidebar = styled.aside.attrs({ 'data-left-sidebar': '' })`
     width: ${SIDEBAR_WIDTH};
     flex: 0 0 ${SIDEBAR_WIDTH};
 

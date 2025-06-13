@@ -24,7 +24,7 @@ export const ToastContainer = styled(Toast)`
     /* ─── мобильная адаптация ─── */
     @media (max-width: 767.98px) {
         position: fixed;
-        top: 16px;               /* под navbar */
+        top: 66px;               /* под navbar */
         left: 50%;
         right: auto;
         transform: translateX(-50%);

@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
-import Offcanvas           from "react-bootstrap/Offcanvas";
-import PomodoroTimer       from "Components/PomodoroTimer/PomodoroTimer";
-import DeleteTaskModal     from "Components/DeleteTaskModal/DeleteTaskModal";
-import { AuthContext }     from "Contexts/AuthContext";
+import React, { useContext, useEffect, useState } from "react";
+import Offcanvas from "react-bootstrap/Offcanvas";        /* ① убрали named-import */
+import PomodoroTimer   from "Components/PomodoroTimer/PomodoroTimer";
+import DeleteTaskModal from "Components/DeleteTaskModal/DeleteTaskModal";
+import { AuthContext } from "Contexts/AuthContext";
+import { DesktopBody } from "./RightSideBar.styled";
 
 import {
     AsideSidebar,
     OffcanvasMobile,
     ToolsButton,
 
-    Header,
+    Header as HeaderStyled,
     ProfileBtn,
     Footer,
     DeleteBtn,
@@ -21,27 +22,38 @@ import {
 } from "./RightSideBar.styled";
 
 const RightSideBar = ({ setTasks, numberOfCompletedTasks, allTasksLength }) => {
-    /* ---------- прогресс ---------- */
+    /* ──────── прогресс задач ──────── */
     const [completed, setCompleted] = useState(0);
     useEffect(() => {
         if (!allTasksLength) return setCompleted(0);
         setCompleted(+((numberOfCompletedTasks / allTasksLength) * 100).toFixed(2));
     }, [allTasksLength, numberOfCompletedTasks]);
 
-    /* ---------- удалить всё ---------- */
+    /* ──────── удалить всё ─────────── */
     const [confirmDelete, setConfirmDelete] = useState(false);
     const openDeleteModal  = () => setConfirmDelete(true);
     const closeDeleteModal = () => setConfirmDelete(false);
 
-    /* ---------- auth ---------- */
+    /* ──────── auth ────────────────── */
     const { user, logout } = useContext(AuthContext);
 
-    /* ---------- off-canvas (мобилка) ---------- */
-    const [showMob, setShowMob] = useState(false);
-    const openMob  = () => setShowMob(true);
-    const closeMob = () => setShowMob(false);
+    /* ──────── off-canvas состояние ── */
+    const [show, setShow] = useState(false);
 
-    /* media-query «мобилка?» — для backdrop */
+    const open  = () => {
+        window.dispatchEvent(new CustomEvent("open-sidebar", { detail: "right" }));
+        setShow(true);
+    };
+    const close = () => setShow(false);
+
+    /*  если открыли левый, закрываемся  */
+    useEffect(() => {
+        const cb = (e) => { if (e.detail !== "right") setShow(false); };
+        window.addEventListener("open-sidebar", cb);
+        return () => window.removeEventListener("open-sidebar", cb);
+    }, []);
+
+    /* ─────── backdrop только на мобилке ─────── */
     const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
     useEffect(() => {
         const h = () => setIsMobile(window.innerWidth < 992);
@@ -51,11 +63,10 @@ const RightSideBar = ({ setTasks, numberOfCompletedTasks, allTasksLength }) => {
 
     const [settingsOpen, setSettingsOpen] = useState(false);
 
-    /* ---------- контент панели (используется 2 раза) ---------- */
-    const PanelContent = (
+    /* ──────── HEADER (фиксировано) ─────── */
+    const HeaderPart = (
         <>
-            {/* Header со встроенным красным крестиком (скрыт на десктопе) */}
-            <Header closeButton closeVariant="white">
+            <HeaderStyled closeButton closeVariant="white">
                 {!!user && (
                     <UserBlock>
                         <UserLabel>{user.displayName || user.email}</UserLabel>
@@ -67,10 +78,14 @@ const RightSideBar = ({ setTasks, numberOfCompletedTasks, allTasksLength }) => {
                     <span>Задач выполнено</span>
                     <ProgressBarContainer now={completed} label={`${completed}%`} />
                 </ProgressContainer>
-            </Header>
-
+            </HeaderStyled>
             <Divider />
+        </>
+    );
 
+    /* ──────── прокручиваемое тело ─────── */
+    const BodyPart = (
+        <>
             <PomodoroTimer onSettingsToggle={setSettingsOpen} />
 
             <Divider />
@@ -89,32 +104,40 @@ const RightSideBar = ({ setTasks, numberOfCompletedTasks, allTasksLength }) => {
         </>
     );
 
+    /* ─────── render ─────── */
     return (
         <>
-            {/* мобильная кнопка «три линии» */}
-            <ToolsButton onClick={openMob} aria-label="виджеты / статистика">
+            {/* кнопка-бургер */}
+            <ToolsButton onClick={open} aria-label="виджеты / статистика">
                 <svg width="28" height="28" viewBox="0 0 16 16" fill="none">
-                    <path d="M2 4h12M2 8h12M2 12h12"
-                          strokeWidth="2" strokeLinecap="round" stroke="#ffffff" />
+                    <path d="M2 4h12M2 8h12M2 12h12" strokeWidth="2" strokeLinecap="round" />
                 </svg>
             </ToolsButton>
 
-            {/* Off-canvas справа (мобилка) */}
+            {/* ───── mobile off-canvas ───── */}
             <OffcanvasMobile
                 placement="end"
-                show={showMob}
-                onHide={closeMob}
+                show={show}
+                onHide={close}
                 scroll
                 backdrop={isMobile}
-                /*  ⬇️ УБИРАЕМ фиксированное false — панель размонтируется,
-                    когда show === false, и не занимает место на странице  */
-                /* unmountOnExit={false} */
             >
-                {PanelContent}
+                {HeaderPart}
+
+                {/* ② используем внутренний Body компонента Offcanvas */}
+                <Offcanvas.Body className="p-0 d-flex flex-column">
+                    {BodyPart}
+                </Offcanvas.Body>
             </OffcanvasMobile>
 
-            {/* статичная панель (десктоп) */}
-            <AsideSidebar>{PanelContent}</AsideSidebar>
+            {/* ───── desktop панель ───── */}
+            <AsideSidebar>
+                {HeaderPart}
+                {/* используем стилизованный контейнер с внутренним паддингом */}
+                <DesktopBody>
+                    {BodyPart}
+                </DesktopBody>
+            </AsideSidebar>
         </>
     );
 };

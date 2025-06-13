@@ -10,12 +10,14 @@ import { AuthProvider }   from "Contexts/AuthContext";
 import ProtectedRoute     from "Routes/ProtectedRoute";
 import AuthScreen         from "Pages/AuthScreen/AuthScreen";
 import HomePage           from "Pages/HomePage/HomePage";
+import darkTheme from "./Theme/darkTheme";
+import lightTheme from "./Theme/lightTheme";
 
 function App() {
     /* что лежит в localStorage (или дефолт на первой загрузке) */
     const [storedThemeJSON] = useLocalStorage(
         "theme",
-        JSON.stringify({ ...defaultTheme })
+        JSON.stringify({ ...lightTheme })
     );
 
     /* сливаем defaultTheme + пользовательские правки (если будут) */

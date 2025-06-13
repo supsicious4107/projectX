@@ -1,12 +1,11 @@
-// src/Components/RightSideBar/RightSideBar.styled.js
-import styled from "styled-components";
-import Offcanvas   from "react-bootstrap/Offcanvas";
-import Button      from "react-bootstrap/Button";
-import ProgressBar from "react-bootstrap/ProgressBar";
+import styled        from "styled-components";
+import Offcanvas     from "react-bootstrap/Offcanvas";
+import Button        from "react-bootstrap/Button";
+import ProgressBar   from "react-bootstrap/ProgressBar";
 
-const SIDEBAR_WIDTH = "340px";
+const SIDEBAR_WIDTH = "270px";
 
-/* ───────── кнопка «три линии» (мобилка) ───────── */
+/* ───────── mobile-burger ───────── */
 export const ToolsButton = styled.button`
     position: fixed;
     top: 12px;
@@ -16,52 +15,65 @@ export const ToolsButton = styled.button`
     padding: 0;
     border: none;
     background: transparent;
+    color: #9a9a9a;
     z-index: 2000;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    svg path { stroke: currentColor; }
+
     @media (min-width: 992px) { display: none; }
 `;
 
-/* ───────── десктоп-панель ───────── */
-export const AsideSidebar = styled.aside`
+/* ───────── desktop-sidebar ───────── */
+export const AsideSidebar = styled.aside.attrs({ "data-right-sidebar": "" })`
     width: ${SIDEBAR_WIDTH};
     flex: 0 0 ${SIDEBAR_WIDTH};
-
-    /* всегда до низа, но растём вместе с контентом */
     min-height: 100vh;
     position: sticky;
     top: 0;
 
-   /* 1)   по-умолчанию ***скрыт*** — чтобы не появлялся на мобилке */
-   display: none;
+    display: none;                 /* скрыт на мобилке */
 
-   /* 2)   на десктопе показываем и прижимаем к правому краю */
-   @media (min-width: 992px) {
-       display: flex;
-       flex-direction: column;
-       margin-left: auto;     /* прижим к правому краю */
-   }
+    @media (min-width: 992px) {    /* показываем на десктопе */
+        display: flex;
+        flex-direction: column;
+        margin-left: auto;           /* прижимаем вправо */
+    }
 
     background: ${({ theme }) => theme.background.primary};
     border-left: 1px solid ${({ theme }) => theme.linecolor.sideBorder};
 `;
 
-/* ───────── off-canvas (мобилка) ───────── */
+/* …верх оставляем без изменений… */
+
 export const OffcanvasMobile = styled(Offcanvas)`
     background: ${({ theme }) => theme.background.primary};
     color:      ${({ theme }) => theme.color.primary};
-    width:  ${SIDEBAR_WIDTH}!important;
+    width: ${SIDEBAR_WIDTH}!important;
     height: 100vh;
     top: 0!important;
     padding-top: 56px;
 
     @media (min-width: 992px) { display: none; }
 
-    .offcanvas-body { overflow-y: auto; }
+    /* ← больше «воздуха» по бокам */
+    .offcanvas-body{
+        overflow-y: auto;
+        padding: 0 20px;            /* ⬆ было 12px, стало 20px */
+    }
 `;
+
+/* ——— для стационарной (desktop) панели даём такой же внутренний отступ ——— */
+export const DesktopBody = styled.div`
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;              /* тот же 20-px отступ */
+`;
+
 
 /* ───────── header ───────── */
 export const Header = styled(Offcanvas.Header)`
@@ -71,7 +83,7 @@ export const Header = styled(Offcanvas.Header)`
 
     .btn-close{
         position: absolute;
-        top: -30px;                 /* поднять над отступом */
+        top: -30px;
         left: 12px;
         width: 16px;
         height: 16px;
@@ -86,7 +98,7 @@ export const Header = styled(Offcanvas.Header)`
     }
 `;
 
-/* ───────── блок «пользователь» ───────── */
+/* ───────── user-block ───────── */
 export const UserBlock  = styled.div`
     display: flex;
     flex-direction: column;
@@ -109,7 +121,7 @@ export const ProfileBtn = styled(Button)`
     :hover{ background:${({ theme }) => theme.background.hover}!important; }
 `;
 
-/* ───────── прогресс-бар ───────── */
+/* ───────── progress bar ───────── */
 export const ProgressBarContainer = styled(ProgressBar)`
     .progress-bar{ background:${({ theme }) => theme.canvas}!important; }
 `;
@@ -121,7 +133,7 @@ export const ProgressContainer = styled.div`
     span{ display:block; margin-bottom:8px; }
 `;
 
-/* ───────── футер ───────── */
+/* ───────── footer ───────── */
 export const Footer = styled.footer`
     display: flex;
     flex-direction: column;
@@ -135,7 +147,7 @@ export const DeleteBtn = styled.span`
     :hover{ color:${({ theme }) => theme.color.hover}; }
 `;
 
-/* ───────── Divider ───────── */
+/* ───────── divider ───────── */
 export const Divider = styled.hr`
     margin: 1rem 0;
     opacity: .4;

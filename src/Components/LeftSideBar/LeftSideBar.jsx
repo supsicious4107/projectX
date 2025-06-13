@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import styled from "styled-components";
+import { useLocation }     from "react-router-dom";
+import styled              from "styled-components";
 
 import Stopwatch      from "Components/Stopwatch/Stopwatch";
 import CountdownTimer from "Components/CountdownTimer/CountdownTimer";
@@ -9,11 +9,10 @@ import {
     AsideSidebar,
     OffcanvasContainer,
     Header,
-    /* TaskBtn - больше не нужен */
     NavBtn,
 } from "./LeftSideBar.styled";
 
-/* бургер-кнопка */
+/* ───── бургер ───── */
 const BurgerButton = styled.button`
     position: fixed;
     top: 12px;
@@ -21,48 +20,56 @@ const BurgerButton = styled.button`
     width: 40px;
     height: 40px;
     border: none;
-    padding: 0;
     background: transparent;
     z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
 
-    @media (min-width: 992px) { display: none; }
+    svg path { stroke: #9a9a9a; }
 
-    svg path { stroke:#fff; }
+    @media (min-width: 992px) { display: none; }
 `;
 
 const WidgetTitle = styled.h6`
-    margin: 1rem 0 0.5rem;
+    margin: 1rem 0 .5rem;
     text-align: center;
     font-weight: 600;
 `;
 
 const LeftSideBar = () => {
-    /* === мобилка? === */
+    /* ╭───────────────── mobile? ─────────────────╮ */
     const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
     useEffect(() => {
-        const handler = () => setIsMobile(window.innerWidth < 992);
-        window.addEventListener("resize", handler);
-        return () => window.removeEventListener("resize", handler);
+        const h = () => setIsMobile(window.innerWidth < 992);
+        window.addEventListener("resize", h);
+        return () => window.removeEventListener("resize", h);
     }, []);
 
-    /* Off-canvas */
-    const [showCanvas, setShowCanvas] = useState(false);
-    const openCanvas  = () => setShowCanvas(true);
-    const closeCanvas = () => setShowCanvas(false);
+    /* ╭───────────────── off-canvas ───────────────╮ */
+    const [show, setShow] = useState(false);
+    const open  = () => {
+        /* ► сообщаем миру, что «левый» открыт            */
+        window.dispatchEvent(new CustomEvent("open-sidebar", { detail: "left" }));
+        setShow(true);
+    };
+    const close = () => setShow(false);
 
-    /* активный пункт меню */
+    /* ► если открыт правый — закрываемся            */
+    useEffect(() => {
+        const cb = (e) => { if (e.detail !== "left") setShow(false); };
+        window.addEventListener("open-sidebar", cb);
+        return () => window.removeEventListener("open-sidebar", cb);
+    }, []);
+
+    /* ╭───────────────── активная ссылка ───────────╮ */
     const { pathname } = useLocation();
-    const allTasks = pathname.split("/")[1];
+    const allTasks     = pathname.split("/")[1];
 
-    /* меню + виджеты */
-    const MenuContent = (
+    /* ╭───────────────── меню + виджеты ────────────╮ */
+    const Menu = (
         <>
-            <NavBtn to="/today-tasks" end onClick={closeCanvas}>
-                Сегодняшние задачи
-            </NavBtn>
+            <NavBtn to="/today-tasks" end onClick={close}>Сегодняшние задачи</NavBtn>
 
             <NavBtn
                 to="/all-tasks"
@@ -71,41 +78,38 @@ const LeftSideBar = () => {
                     ["important-tasks","completed-tasks","uncompleted-tasks","today-tasks"].includes(allTasks)
                         ? "" : "active"
                 }
-                onClick={closeCanvas}
-            >
-                Все задачи
-            </NavBtn>
+                onClick={close}
+            >Все задачи</NavBtn>
 
-            <NavBtn to="/important-tasks"  end onClick={closeCanvas}>Важные задачи</NavBtn>
-            <NavBtn to="/completed-tasks"  end onClick={closeCanvas}>Завершённые задачи</NavBtn>
-            <NavBtn to="/uncompleted-tasks" end onClick={closeCanvas}>Незавершённые задачи</NavBtn>
+            <NavBtn to="/important-tasks"  end onClick={close}>Важные задачи</NavBtn>
+            <NavBtn to="/completed-tasks"  end onClick={close}>Завершённые задачи</NavBtn>
+            <NavBtn to="/uncompleted-tasks" end onClick={close}>Незавершённые задачи</NavBtn>
 
-            <hr className="opacity-25" />
+            <hr className="opacity-25"/>
 
             <WidgetTitle>Секундомер</WidgetTitle>
-            <Stopwatch />
+            <Stopwatch/>
 
-            <hr className="opacity-25" />
+            <hr className="opacity-25"/>
 
             <WidgetTitle>Таймер</WidgetTitle>
-            <CountdownTimer />
+            <CountdownTimer/>
         </>
     );
 
+    /* ╭───────────────── render ─────────────────────╮ */
     return (
         <>
-            {/* бургер (мобилка) */}
-            <BurgerButton onClick={openCanvas} aria-label="меню">
+            <BurgerButton onClick={open} aria-label="меню">
                 <svg width="28" height="28" viewBox="0 0 16 16" fill="none">
-                    <path d="M1 3h14M1 8h14M1 13h14" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M1 3h14M1 8h14M1 13h14" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
             </BurgerButton>
 
-            {/* Off-canvas (мобилка) */}
             <OffcanvasContainer
                 placement="start"
-                show={showCanvas}
-                onHide={closeCanvas}
+                show={show}
+                onHide={close}
                 backdrop={isMobile}
                 scroll
                 unmountOnExit={false}
@@ -115,17 +119,15 @@ const LeftSideBar = () => {
                 </Header>
 
                 <div className="p-2 d-flex flex-column overflow-auto" style={{ flex: 1 }}>
-                    {MenuContent}
+                    {Menu}
                 </div>
             </OffcanvasContainer>
 
-            {/* десктоп-сайдбар */}
-            <AsideSidebar>
-                <Header>
-                    <h5 className="title">Планировщик</h5>
-                </Header>
+            {/* десктоп-версия */}
+            <AsideSidebar data-left-sidebar>
+                <Header><h5 className="title">Планировщик</h5></Header>
                 <div className="p-2 d-flex flex-column overflow-auto" style={{ flex: 1 }}>
-                    {MenuContent}
+                    {Menu}
                 </div>
             </AsideSidebar>
         </>
