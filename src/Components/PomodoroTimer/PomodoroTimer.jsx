@@ -14,7 +14,7 @@ const Tabs = styled(ButtonGroup)`
     flex-wrap:wrap;               /* кнопки можно переносить */
 
     .btn{
-        flex:1 1 0;               /* две в строку → текст не лезет друг на друга */
+        flex:1 0 50%;               /* две в строку → текст не лезет друг на друга */
         min-width:0;
         white-space:normal;
         line-height:1.2;
@@ -25,9 +25,9 @@ const Tabs = styled(ButtonGroup)`
     }
 
     /* ≥576 px оставляем привычную однострочную полосу */
-@media (max-width:575.98px){
-       .btn{ flex:1 0 100%; }
- }
+    @media (min-width:576px){
+        .btn{ flex:1 0 auto; }
+    }
 `;
 
 const SettingsWrapper = styled.div`
